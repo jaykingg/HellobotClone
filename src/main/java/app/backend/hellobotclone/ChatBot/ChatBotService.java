@@ -44,6 +44,7 @@ public class ChatBotService {
                 .responseContent(rcontent2)
                 .responseAnswer(acontent2)
                 .type(Set.of(TypeEnum.TEXT))
+                .imageFilePath("EMPTY")
                 .build();
         chatResponseRepository.save(chatResponse);
 
@@ -57,6 +58,7 @@ public class ChatBotService {
                 .responseContent(rcontent3)
                 .responseAnswer(acontent3)
                 .type(Set.of(TypeEnum.TEXT))
+                .imageFilePath("EMPTY")
                 .build();
         chatResponseRepository.save(chatResponse);
 
@@ -92,6 +94,7 @@ public class ChatBotService {
                 .responseContent(rcontent5)
                 .responseAnswer(acontent5)
                 .type(Set.of(TypeEnum.TEXT))
+                .imageFilePath("EMPTY")
                 .build();
         chatResponseRepository.save(chatResponse);
 
@@ -103,6 +106,7 @@ public class ChatBotService {
                 .responseContent(rcontent6)
                 .responseAnswer(acontent6)
                 .type(Set.of(TypeEnum.TEXT))
+                .imageFilePath("EMPTY")
                 .build();
         chatResponseRepository.save(chatResponse);
 

@@ -9,24 +9,14 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-// @WebMvcTest
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration.class)
-@ActiveProfiles("test")
 @Ignore
 public class BaseControllerTest {
 
@@ -42,41 +32,4 @@ public class BaseControllerTest {
     @Autowired
     protected AppProperties appProperties;
 
-
-    public String getBearerToken() throws Exception {
-        return "Bearer " + getAccessToken();
-    }
-
-
-    public String getAccessToken() throws Exception{
-        ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(appProperties.getClientId(),appProperties.getClientSecret())) //basic Auth 라는 header를 만듦.
-                .param("username","admin")
-                .param("password","1234")
-                .param("grant_type","password"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("access_token").exists()
-                );
-
-        var responseBody = perform.andReturn().getResponse().getContentAsString();
-        Jackson2JsonParser parser = new Jackson2JsonParser();
-        return parser.parseMap(responseBody).get("access_token").toString();
-    }
-
-    public String getRefreshToken() throws Exception{
-        ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(appProperties.getClientId(),appProperties.getClientSecret())) //basic Auth 라는 header를 만듦.
-                .param("username","TDD_TEMP_ID")
-                .param("password","1234")
-                .param("grant_type","password"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("refresh_token").exists()
-                );
-
-        var responseBody = perform.andReturn().getResponse().getContentAsString();
-        Jackson2JsonParser parser = new Jackson2JsonParser();
-        return parser.parseMap(responseBody).get("refresh_token").toString();
-    }
 }

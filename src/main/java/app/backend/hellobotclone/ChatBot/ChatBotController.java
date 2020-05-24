@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -29,7 +28,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -134,7 +132,7 @@ public class ChatBotController {
         ControllerLinkBuilder selfLinkBuilder = linkTo(ChatBotController.class);
         URI createdUri = selfLinkBuilder.toUri();
 
-        ChatBotResource chatBotResource = new ChatBotResource(newChatBotScenarioDto);
+        ChatBotScenarioResource chatBotResource = new ChatBotScenarioResource(newChatBotScenarioDto);
         chatBotResource.add(linkTo(ChatBotController.class).slash("makeScenario").withSelfRel());
         chatBotResource.add(linkTo(ChatBotController.class).slash(1).withRel("시나리오 시작 링크"));
         chatBotResource.add(new Link("/docs/index.html#resource-makeScenario").withRel("profile"));

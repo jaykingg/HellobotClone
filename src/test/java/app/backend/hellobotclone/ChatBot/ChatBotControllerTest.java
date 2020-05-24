@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -26,12 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ChatBotControllerTest extends BaseControllerTest {
-    //TODO
-    /*
-     * TDD 상황별로 짜기
-     * 문서화
-     * Spring docs 빌드
-     * */
+
 
     @Autowired
     AccountRepository accountRepository;
@@ -41,39 +37,47 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("사전에 생성된 Account 계정 정보를 가져오는 API테스트")
-    public void getAccount() throws Exception{
-//        //given
-//        this.mockMvc.perform(get("/api/chat"))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("content.id").exists())
-//                .andExpect(jsonPath("_links").exists())
-//                .andDo(document("getAccount",links(
-//                        linkWithRel("self").description("현재 링크"),
-//                        linkWithRel("시나리오 만들기 링크").description("시나리오 만들기 링크"),
-//                        linkWithRel("profile").description("도큐먼트 링크")
-//
-//                        ),
-//                        responseFields(
-//                                fieldWithPath("id").description("USER ID"),
-//                                fieldWithPath("name").description("USER NAME"),
-//                                fieldWithPath("birth").description("USER BIRTHDAY"),
-//                                fieldWithPath("sex").description("USER SEX"),
-//                                fieldWithPath("keyword").description("USER KEYWORD"),
-//                                fieldWithPath("ChatBotToken").description("USER CHATBOT-TOKEN")
-//                        )
-//                ))
-//        ;
+    public void getAccountTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("content.id").exists())
+                .andExpect(jsonPath("_links").exists())
+                .andDo(document("getAccount",links(
+                        linkWithRel("self").description("현재 링크"),
+                        linkWithRel("시나리오 만들기 링크").description("시나리오 만들기 링크"),
+                        linkWithRel("profile").description("도큐먼트 링크")
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("content").description("Account Info"),
+                                fieldWithPath("content.id").description("User ID"),
+                                fieldWithPath("content.name").description("User Name"),
+                                fieldWithPath("content.birth").description("User Birth"),
+                                fieldWithPath("content.sex").description("User Sex"),
+                                fieldWithPath("content.keyword").description("User Keyword"),
+                                fieldWithPath("content.ChatBotToken").description("User ChatBot-Token")
+                        )
+                ))
+        ;
     }
 
     @Test
     @TestDescription("잘못된 토큰을 가지고 허용되지않은 자원에 접근할 경우의 API테스트")
-    public void accessWrongToken() {
+    public void accessWrongTokenTest() throws Exception{
+        createTddAccount();
 
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer BadToken"))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
     }
 
     @Test
     @TestDescription("미리 작성된 시나리오를 생성하는 API테스트")
-    public void makeScenario() throws Exception{
+    public void makeScenarioTest() throws Exception{
 
         createTddAccount();
 
@@ -90,13 +94,13 @@ public class ChatBotControllerTest extends BaseControllerTest {
                         linkWithRel("profile").description("도큐먼트 링크")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("account").description("ACCOUNT INFO"),
-                                fieldWithPath("account.id").description("USER ID"),
-                                fieldWithPath("account.name").description("USER NAME"),
-                                fieldWithPath("account.birth").description("USER BIRTHDAY"),
-                                fieldWithPath("account.sex").description("USER SEX"),
-                                fieldWithPath("account.keyword").description("USER KEYWORD"),
-                                fieldWithPath("account.ChatBotToken").description("USER CHATBOT-TOKEN"),
+                                fieldWithPath("account").description("Account Info"),
+                                fieldWithPath("account.id").description("User ID"),
+                                fieldWithPath("account.name").description("User Name"),
+                                fieldWithPath("account.birth").description("User Birth"),
+                                fieldWithPath("account.sex").description("User Sex"),
+                                fieldWithPath("account.keyword").description("User Keyword"),
+                                fieldWithPath("account.ChatBotToken").description("User ChatBot-Token"),
                                 fieldWithPath("scenario").description("Scenario Data"),
                                 fieldWithPath("scenario[0].id").description("Scenario Depth"),
                                 fieldWithPath("scenario[0].type").description("Bot Response Type"),
@@ -110,8 +114,11 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("채팅 시작시, 응답을 가져오는 API테스트")
-    public void chatStart() throws Exception{
-        //createTddAccount();
+    public void chatStartTest() throws Exception{
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
 
         this.mockMvc.perform(post("/api/chat/1")
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken()))
@@ -126,13 +133,13 @@ public class ChatBotControllerTest extends BaseControllerTest {
                         linkWithRel("profile").description("도큐먼트 링크")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("account").description("ACCOUNT INFO"),
-                                fieldWithPath("account.id").description("USER ID"),
-                                fieldWithPath("account.name").description("USER NAME"),
-                                fieldWithPath("account.birth").description("USER BIRTHDAY"),
-                                fieldWithPath("account.sex").description("USER SEX"),
-                                fieldWithPath("account.keyword").description("USER KEYWORD"),
-                                fieldWithPath("account.ChatBotToken").description("USER CHATBOT-TOKEN"),
+                                fieldWithPath("account").description("Account Info"),
+                                fieldWithPath("account.id").description("User ID"),
+                                fieldWithPath("account.name").description("User Name"),
+                                fieldWithPath("account.birth").description("User Birth"),
+                                fieldWithPath("account.sex").description("User Sex"),
+                                fieldWithPath("account.keyword").description("User Keyword"),
+                                fieldWithPath("account.ChatBotToken").description("User ChatBot-Token"),
                                 fieldWithPath("chatResponse").description("ChatBot Response Data"),
                                 fieldWithPath("chatResponse.id").description("ChatBot Response  Depth"),
                                 fieldWithPath("chatResponse.type").description("ChatBot Response Type"),
@@ -146,7 +153,12 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("각 대화 Depth(단계)에 따라, 사용자가 빠른선택지를 이용했을 때 응답하는 API테스트")
-    public void chatReponseButton() throws Exception{
+    public void chatReponseButtonTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
 
         ChatBotMsgDto chatBotMsgDto = ChatBotMsgDto.builder()
                 .type(TypeEnum.BUTTON)
@@ -173,13 +185,13 @@ public class ChatBotControllerTest extends BaseControllerTest {
                                 fieldWithPath("userAnswer").description("User Answer")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("account").description("ACCOUNT INFO"),
-                                fieldWithPath("account.id").description("USER ID"),
-                                fieldWithPath("account.name").description("USER NAME"),
-                                fieldWithPath("account.birth").description("USER BIRTHDAY"),
-                                fieldWithPath("account.sex").description("USER SEX"),
-                                fieldWithPath("account.keyword").description("USER KEYWORD"),
-                                fieldWithPath("account.ChatBotToken").description("USER CHATBOT-TOKEN"),
+                                fieldWithPath("account").description("Account Info"),
+                                fieldWithPath("account.id").description("User ID"),
+                                fieldWithPath("account.name").description("User Name"),
+                                fieldWithPath("account.birth").description("User Birth"),
+                                fieldWithPath("account.sex").description("User Sex"),
+                                fieldWithPath("account.keyword").description("User Keyword"),
+                                fieldWithPath("account.ChatBotToken").description("User ChatBot-Token"),
                                 fieldWithPath("chatResponse").description("ChatBot Response Data"),
                                 fieldWithPath("chatResponse.id").description("ChatBot Response  Depth"),
                                 fieldWithPath("chatResponse.type").description("ChatBot Response Type"),
@@ -194,10 +206,16 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("각 대화 Depth(단계)에 따라, 사용자가 자유입력형식을 이용했을 때 응답하는 API테스트")
-    public void chatResponseFree() throws Exception{
+    public void chatResponseFreeTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
+
         ChatBotMsgDto chatBotMsgDto = ChatBotMsgDto.builder()
                 .type(TypeEnum.FREE)
-                .userAnswer("좋아")
+                .userAnswer("그래")
                 .build();
 
         this.mockMvc.perform(post("/api/chat/3")
@@ -220,13 +238,13 @@ public class ChatBotControllerTest extends BaseControllerTest {
                                 fieldWithPath("userAnswer").description("User Answer")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("account").description("ACCOUNT INFO"),
-                                fieldWithPath("account.id").description("USER ID"),
-                                fieldWithPath("account.name").description("USER NAME"),
-                                fieldWithPath("account.birth").description("USER BIRTHDAY"),
-                                fieldWithPath("account.sex").description("USER SEX"),
-                                fieldWithPath("account.keyword").description("USER KEYWORD"),
-                                fieldWithPath("account.ChatBotToken").description("USER CHATBOT-TOKEN"),
+                                fieldWithPath("account").description("Account Info"),
+                                fieldWithPath("account.id").description("User ID"),
+                                fieldWithPath("account.name").description("User Name"),
+                                fieldWithPath("account.birth").description("User Birth"),
+                                fieldWithPath("account.sex").description("User Sex"),
+                                fieldWithPath("account.keyword").description("User Keyword"),
+                                fieldWithPath("account.ChatBotToken").description("User ChatBot-Token"),
                                 fieldWithPath("chatResponse").description("ChatBot Response Data"),
                                 fieldWithPath("chatResponse.id").description("ChatBot Response  Depth"),
                                 fieldWithPath("chatResponse.type").description("ChatBot Response Type"),
@@ -243,7 +261,13 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("각 대화 Depth(단계)에 따라, 사용자가 '잘못된' 빠른선택지를 이용했을 때 응답하는 API테스트")
-    public void chatWroungResponseButton() throws Exception{
+    public void chatWroungResponseButtonTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
+
         ChatBotMsgDto chatBotMsgDto = ChatBotMsgDto.builder()
                 .type(TypeEnum.BUTTON)
                 .userAnswer("헬로우")
@@ -261,7 +285,12 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("각 대화 Depth(단계)에 따라, 사용자가 이용한 자유입력이 정해진 응답과 방향이 다를 경우 API테스트")
-    public void chatDifferentResponseFree() throws Exception{
+    public void chatDifferentResponseFreeTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
 
         ChatBotMsgDto chatBotMsgDto = ChatBotMsgDto.builder()
                 .type(TypeEnum.FREE)
@@ -279,7 +308,12 @@ public class ChatBotControllerTest extends BaseControllerTest {
 
     @Test
     @TestDescription("각 대화 Depth(단계)에 따른 프로세스 진행시, 온전하지 못한 Dto를 전송할 경우의 API테스트")
-    public void transferWrongDto() throws Exception{
+    public void transferWrongDtoTest() throws Exception{
+
+        createTddAccount();
+
+        this.mockMvc.perform(get("/api/chat/makeScenario")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken()));
 
         ChatBotMsgDto chatBotMsgDto = ChatBotMsgDto.builder()
                 .type(TypeEnum.BUTTON)
@@ -290,7 +324,7 @@ public class ChatBotControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(chatBotMsgDto)))
                 .andDo(print())
-                .andExpect(status().)
+                .andExpect((MockMvcResultMatchers.status().is(HttpStatus.valueOf(400).value())))
         ;
 
     }
